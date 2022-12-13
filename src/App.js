@@ -1,24 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+
+import { useState, useEffect } from "react";
+import OneFacialExpression from "./oneFacialExpression.js"
+import WelcomePage from './welcomePage';
+import LoadOneImage from "./loadOneImage.js";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+  const [showWelcomePage, setShowWelcomePage] = useState(true)
+  const [showOneFacialExpression, setshowOneFacialExpression] = useState(false);
+  const [showTwoFacialExpressions, setshowTwoFacialExpressions] = useState(false);
+  const [showSevenFacialExpressions, setshowSevenFacialExpressions] = useState(false);
+
+
+  function updateViewParent(view){
+    switch (view) {
+      case 'oneExpression':
+        setShowWelcomePage(false);
+        setshowOneFacialExpression(true);
+        setshowTwoFacialExpressions(false);
+        setshowSevenFacialExpressions(false);
+        break;
+      case 'twoExpressions':
+        setShowWelcomePage(false);
+        setshowOneFacialExpression(false);
+        setshowTwoFacialExpressions(true);
+        setshowSevenFacialExpressions(false);
+        break;
+      case 'sevenExpressions':
+        setShowWelcomePage(false);
+        setshowOneFacialExpression(false);
+        setshowTwoFacialExpressions(false);
+        setshowSevenFacialExpressions(true);
+        break;
+      default:
+        break;
+    }
+  }
+  return (<>
+
+    {showWelcomePage ? < WelcomePage updateViewParent={updateViewParent} /> : null}
+    {showOneFacialExpression ? <LoadOneImage/> : null }
+        
+  </>
+
   );
 }
 
