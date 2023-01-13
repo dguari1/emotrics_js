@@ -8,8 +8,8 @@ function WelcomePage({updateViewParent}) {
  function handleClick (event) {
 
     switch (event.target.id) {
-        case 'oneExpression':
-            updateViewParent('oneExpression');
+        case 'loadOneExpression':
+            updateViewParent('loadOneExpression');
             break;
         default:
             break;
@@ -38,7 +38,7 @@ function WelcomePage({updateViewParent}) {
       
       
       <div className="col-sm-3 btn-group">
-        <button  className='btn' id='oneExpression' onClick={handleClick}>Process One Facial Expression</button>
+        <button  className='btn' id='loadOneExpression' onClick={handleClick}>Process One Facial Expression</button>
         <button className='btn'>Process Two Facial Expressions</button>
         <button className='btn'>Process Seven Facial Expressions</button>
       </div>

@@ -49,13 +49,13 @@ class ShowImage extends Component {
 
 
         this.panZoomRef.current = panzoom(this.imageRef.current, {
-            minZoom: .5,
-            maxZoom: 4,
+            minZoom: 1,
+            maxZoom: 10,
             
         });
         this.panZoomCanvasRef.current = panzoom(this.canvasRef.current, {
-            minZoom: .5,
-            maxZoom: 4,
+            minZoom: 1,
+            maxZoom: 10,
         });
 
         // this.panZoomRef.current.on('pan', () => this.updateCanvasInView()); 
@@ -79,13 +79,16 @@ class ShowImage extends Component {
             let transform = this.ctx.getTransform()
             let x = (rect.left-transform.e)/transform.a
             let y = (rect.top-transform.f)/transform.d
-            console.log('x', x)
-            console.log('y', y)
+            // console.log('x', x)
+            // console.log('y', y)
             this.canvasImageRef.current.style.left = `${x-3}px`
             this.canvasImageRef.current.style.top = `${y-3}px`
             this.canvasImageRef.current.width = rect.width;
             this.canvasImageRef.current.height = rect.height;
-            this.drawLandmakrs()
+            this.drawLandmarks()
+            console.log(this.panZoomRef.current.getTransform().scale)
+            
+
         }
         )
 
@@ -102,8 +105,8 @@ class ShowImage extends Component {
 
         // this.landmarks  data[0]
         if (data) {
-            this.getUsefulLandmakrs(data[0])
-            this.drawLandmakrs()
+            this.getUsefulLandmarks(data[0])
+            this.drawLandmarks()
 
         }
         // 
@@ -121,7 +124,7 @@ class ShowImage extends Component {
 
     }
  
-    getUsefulLandmakrs = (data) => {
+    getUsefulLandmarks = (data) => {
 
         FACEMESH_LIPS.forEach(item => {
             this.landmarks.push({x: data.keypoints[item].x, 
@@ -164,16 +167,18 @@ class ShowImage extends Component {
         this.panZoomRef.current.dispose();
     }
 
-    drawLandmakrs = () =>{
+    drawLandmarks = () =>{
         this.ctxImg.beginPath();
         this.ctxImg.fillStyle = 'red'
+        const scale = this.panZoomRef.current.getTransform().scale
+        const dim = 3*scale
         this.landmarks.forEach(item =>{
-            this.ctxImg.fillRect(item.x, item.y, 2,2)
+            this.ctxImg.fillRect(item.x*scale, item.y*scale, dim,dim)
         }) 
 
         this.ctxImg.fillStyle = 'green'
         this.iris.forEach(item =>{
-            this.ctxImg.fillRect(item.x, item.y, 2,2)
+            this.ctxImg.fillRect(item.x*scale, item.y*scale, dim,dim)
         })
 
     }
@@ -213,6 +218,15 @@ class ShowImage extends Component {
         var pos = this.getMousePosition(event, this.canvasRef.current)
         console.log(pos)
 
+        if (event.button == 0)
+            {console.log('left')}
+        else if (event.button == 2) 
+        {console.log('right')}
+
+    }
+
+    handleonContextMenu = () => {
+        return false
     }
  
     render() {
@@ -222,12 +236,14 @@ class ShowImage extends Component {
                     <div className='container' ref={this.elementRef}>
                         <canvas className='landmarks-canvas' 
                         ref={this.canvasRef}
+                        onContextMenu={(e)=> e.preventDefault()}
                         />
                         <canvas className='image-canvas' 
                         ref={this.canvasImageRef}
                         onMouseDown = {this.handleMouseDown}
+                        onContextMenu={(e)=> e.preventDefault()}
                         />
-                        <img className='landmarks-image' ref={this.imageRef} src={image}/>
+                        <img className='landmarks-image' ref={this.imageRef} src={image} onContextMenu={(e)=> e.preventDefault()} />
                     </div>
                 
                     <div className="patient-info">

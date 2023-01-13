@@ -3,16 +3,21 @@
 import React from 'react'
 import { useDropzone } from "react-dropzone";
 
-function Dropzone({ onDrop, accept, open }) {
+function Dropzone({ onDrop, accept, open, text, hideList=true}) {
   const { getRootProps, getInputProps, isDragActive, acceptedFiles } =
     useDropzone({
       accept,
       onDrop,
     });
 
+  // const files = acceptedFiles.map((file) => (
+  //   <li key={file.path}>
+  //     {file.path} - {file.size} bytes
+  //   </li>
+  // ));
   const files = acceptedFiles.map((file) => (
     <li key={file.path}>
-      {file.path} - {file.size} bytes
+      {file.path} 
     </li>
   ));
 
@@ -23,21 +28,21 @@ function Dropzone({ onDrop, accept, open }) {
         <div className="text-center">
           {isDragActive ? (
             <p className="dropzone-content">
-            Drop file here
+            {text}{/* Drop Image here */}
             </p>
           ) : (
             <p className="dropzone-content">
-              Drop file here
+              {text}{/* Drop Image here */}
             </p>
           )}
           <button type="button" onClick={open} className="btn">
-            Select Files
+            Select File
           </button>
         </div>
       </div>
-      {/* <aside>
-        <ul>{files}</ul>
-      </aside> */}
+      <aside hidden={hideList}>
+        <ul style={{fontSize:'0.6em', textAlign:'left'}}>{files}</ul>
+      </aside> 
     </div>
   );
 }

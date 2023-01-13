@@ -99,7 +99,7 @@ class ShowImage extends Component {
 
     }
  
-    getUsefulLandmakrs = (data) => {
+    getUsefulLandmarks = (data) => {
 
         FACEMESH_LIPS.forEach(item => {
             this.landmarks.push({x: data.keypoints[item].x, 
@@ -142,7 +142,7 @@ class ShowImage extends Component {
         this.panZoomRef.current.dispose();
     }
 
-    drawLandmakrs = () =>{
+    drawLandmarks = () =>{
         this.ctx = this.canvasRef.current.getContext('2d')
         this.ctx.beginPath();
         this.ctx.fillStyle = 'red'
@@ -202,6 +202,7 @@ class ShowImage extends Component {
                         onMouseDown = {this.handleMouseDown}
                         />
                         <img className='landmarks-image' ref={this.imageRef} src={image}/>
+
  
                     </div>
                 
