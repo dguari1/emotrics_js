@@ -1,4 +1,4 @@
-import React, { Component, createRef, useRef, useLayoutEffect } from 'react';
+import React, { Component, createRef } from 'react';
 import panzoom from 'panzoom';
 
 import data from './landmarks.json';
@@ -6,9 +6,10 @@ import image from './visa.jpeg';
 // import image from './IMG_0295.jpeg'
 import './showImage.css'
 import { FACEMESH_CONTOURS } from '@mediapipe/face_mesh';
-import { toHaveStyle } from '@testing-library/jest-dom/dist/matchers';
 
 // const panzoom = require('./showImage.js') 
+// const lineByLine = require('n-readlines');
+import LineReader from 'n-readlines';
 
 const FACEMESH_LIPS = [61,146,91,181,84,17,314,405,321,375,291,185,40,39,37,
     0,267,269,270,409,291,95,88,178,87,14,317,402,318,324,308,191,80,81,
@@ -53,7 +54,7 @@ class ShowImage extends Component {
             maxZoom: 10,
             
         });
-        this.panZoomCanvasRef.current = panzoom(this.canvasRef.current, {
+        this.panZoomCanvasRef.current = panzoom(this.canvasImageRef.current, {
             minZoom: 1,
             maxZoom: 10,
         });
@@ -62,19 +63,14 @@ class ShowImage extends Component {
         // this.panZoomRef.current.on('zoom', () => this.updateCanvasInView()); 
         // this.panZoomRef.current.on('panend', () => this.updateCanvasInView()); 
         // this.panZoomRef.current.on('zoomend', () => this.updateCanvasInView()); 
-
         // this.panZoomRef.current.on('transform', () => this.updateCanvasInView()); 
 
         this.ctx = this.canvasRef.current.getContext('2d')
         this.ctxImg = this.canvasImageRef.current.getContext('2d')
-        this.canvasRef.current.width = this.imageRef.current.width;
-        this.canvasRef.current.height = this.imageRef.current.height;
-        this.ctx.drawImage(this.imageRef.current,0,0,this.canvasRef.current.width,this.canvasRef.current.height)
-
+        
 
         this.panZoomRef.current.on('transform', () => {
             // console.log(this.ctx.getTransform())
-            
             let rect = this.canvasRef.current.getBoundingClientRect()
             let transform = this.ctx.getTransform()
             let x = (rect.left-transform.e)/transform.a
@@ -86,9 +82,7 @@ class ShowImage extends Component {
             this.canvasImageRef.current.width = rect.width;
             this.canvasImageRef.current.height = rect.height;
             this.drawLandmarks()
-            console.log(this.panZoomRef.current.getTransform().scale)
-            
-
+            //console.log(this.panZoomRef.current.getTransform().scale)
         }
         )
 
@@ -104,14 +98,33 @@ class ShowImage extends Component {
         // img.src = './visa.jpeg';
 
         // this.landmarks  data[0]
-        if (data) {
-            this.getUsefulLandmarks(data[0])
-            this.drawLandmarks()
+        // if (data) {
+        //     this.getUsefulLandmarks(data[0])
+        //     this.drawLandmarks()
 
-        }
-        // 
+        // }
+        // // 
+
+        this.processInitialData()
 
     }
+
+    processInitialData = () => {
+
+        this.imageRef.current.src = this.props.data.image
+        this.canvasRef.current.width = this.imageRef.current.width;
+        this.canvasRef.current.height = this.imageRef.current.height;
+        this.ctx.drawImage(this.imageRef.current,0,0,this.canvasRef.current.width,this.canvasRef.current.height)
+
+
+        var lines = this.props.data.landmarks.split('\n');
+        for (var line = 0; line < lines.length; line++) {
+        console.log(lines[line]);
+        }
+
+    }
+
+
 
     updateCanvasInView = () => {
         let rect = this.imageRef.current.getBoundingClientRect()
@@ -192,6 +205,7 @@ class ShowImage extends Component {
                 this.panZoomCanvasRef.current.zoomAbs(0, 0, 1);
                 break;
             case 'return':
+                this.props.updateViewParent('welcomePage')
                 break
             default:
                 break;
@@ -218,15 +232,11 @@ class ShowImage extends Component {
         var pos = this.getMousePosition(event, this.canvasRef.current)
         console.log(pos)
 
-        if (event.button == 0)
+        if (event.button === 0)
             {console.log('left')}
-        else if (event.button == 2) 
+        else if (event.button === 2) 
         {console.log('right')}
 
-    }
-
-    handleonContextMenu = () => {
-        return false
     }
  
     render() {
@@ -234,16 +244,17 @@ class ShowImage extends Component {
             <div>
                 <div className='wrapperPage' >
                     <div className='container' ref={this.elementRef}>
-                        <canvas className='landmarks-canvas' 
+                        {/* <canvas className='landmarks-canvas' 
                         ref={this.canvasRef}
-                        onContextMenu={(e)=> e.preventDefault()}
-                        />
+                        onContextMenu={(e)=> e.preventDefault() }
+                        style={{visibility:'hidden'}}
+                        /> */}
                         <canvas className='image-canvas' 
                         ref={this.canvasImageRef}
                         onMouseDown = {this.handleMouseDown}
                         onContextMenu={(e)=> e.preventDefault()}
                         />
-                        <img className='landmarks-image' ref={this.imageRef} src={image} onContextMenu={(e)=> e.preventDefault()} />
+                        <img className='landmarks-image' alt='' ref={this.imageRef} src={image} onContextMenu={(e)=> e.preventDefault()} />
                     </div>
                 
                     <div className="patient-info">
@@ -272,7 +283,7 @@ class ShowImage extends Component {
                     </div>
                     <div className='back-button'>
                         <button className='btn-reset' id='resetZoom' onClick={this.handleClick}>Reset Zoom</button>
-                        <button className='btn-return' id='return' onClick={this.handleClick}>Previous Page</button>
+                        <button className='btn-return' id='return' onClick={this.handleClick}>Main Page</button>
 
                     </div>
                 </div>

@@ -81,6 +81,7 @@ button:hover {
 }
 
 .btn-reset{
+    background-color: white;
     border-radius: 3px;
     width: 70px;
     height: 70px;
@@ -89,14 +90,21 @@ button:hover {
     vertical-align: top;
     text-align: center;
 }
+.btn-reset:hover{
+    transform: scale(1.05);
+}
 
 .btn-return{
+    background-color: white;
     display: float;
     border-radius: 3px;
     width: 70px;
     height: 70px;
     margin: auto auto;
     
+}
+.btn-return:hover{
+    transform: scale(1.05);
 }
 
 .btn-measures {
@@ -109,5 +117,4 @@ button:hover {
 
 .btn-measures:hover {
     transform: scale(1.05);
-
 }

@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from "react";
-import OneFacialExpression from "./oneFacialExpression.js"
+import React, { useState} from "react";
+// import OneFacialExpression from "./oneFacialExpression.js"
 import WelcomePage from './welcomePage';
 import LoadOneImage from "./loadOneImage.js";
 import ShowImage from './showImage2.js';
@@ -21,7 +21,7 @@ function App() {
 
 
   // page selector function, this function makes sure to show the correct page after being called
-  function updateViewParent(view, data){
+  function updateViewParent(view, data=null){
     switch (view) {
 
       case 'welcomePage':
@@ -34,6 +34,8 @@ function App() {
         setShowLoadOneFacialExpression(false);
         setShowLoadTwoFacialExpressions(false);
         setShowLoadSevenFacialExpressions(false);
+
+        setData(data)
 
         break;
 
@@ -48,6 +50,8 @@ function App() {
         setShowLoadTwoFacialExpressions(false);
         setShowLoadSevenFacialExpressions(false);
 
+        setData(data)
+
         break;
 
       case 'loadTwoExpressions':
@@ -61,9 +65,11 @@ function App() {
         setShowLoadTwoFacialExpressions(true);
         setShowLoadSevenFacialExpressions(false);
 
+        setData(data)
+
         break;
 
-      case 'loadTwoExpressions':
+      case 'loadSevenExpressions':
         setShowWelcomePage(false);
 
         setShowOneFacialExpression(false);
@@ -73,6 +79,8 @@ function App() {
         setShowLoadOneFacialExpression(false);
         setShowLoadTwoFacialExpressions(false);
         setShowLoadSevenFacialExpressions(true);
+
+        setData(data)
 
         break;
 
@@ -87,6 +95,8 @@ function App() {
         setShowLoadTwoFacialExpressions(false);
         setShowLoadSevenFacialExpressions(false);
 
+        setData(data)
+
         break;
 
       case 'twoExpressions':
@@ -99,6 +109,8 @@ function App() {
         setShowLoadOneFacialExpression(false);
         setShowLoadTwoFacialExpressions(false);
         setShowLoadSevenFacialExpressions(false);
+
+        setData(data)
 
         break;
 
@@ -113,6 +125,8 @@ function App() {
         setShowLoadTwoFacialExpressions(false);
         setShowLoadSevenFacialExpressions(false);
 
+        setData(data)
+
         break;
 
       default:
@@ -123,7 +137,9 @@ function App() {
 
     {showWelcomePage ? < WelcomePage updateViewParent={updateViewParent} /> : null}
     {showLoadOneFacialExpression ? <LoadOneImage updateViewParent={updateViewParent}/> : null }
-    {showOneFacialExpression ? <ShowImage updateViewParent={updateViewParent}/> : null }
+    {showOneFacialExpression ? <ShowImage updateViewParent={updateViewParent}
+                                          data = {data}
+                                          /> : null }
         
   </>
 

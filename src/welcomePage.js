@@ -1,7 +1,7 @@
 import logo from './Home_logo.jpeg';
 import './App.css';
-import { useState, useEffect } from "react";
-import OneFacialExpression from "./oneFacialExpression.js"
+import React from "react";
+// import OneFacialExpression from "./oneFacialExpression.js"
 
 function WelcomePage({updateViewParent}) {
 
@@ -32,7 +32,7 @@ function WelcomePage({updateViewParent}) {
       </header>
     <div className='wrapper'>
       <div className = "center-image">
-        <img width={"400"} src={logo}></img>
+        <img width={"400"} src={logo} alt='logo'></img>
         <div className='title'> Welcome to Emotrics+</div>
       </div>
       

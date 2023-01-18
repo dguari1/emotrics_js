@@ -36,17 +36,29 @@ body {
 .dropzone {
     text-align: center;
     padding: 5px;
-    border: 3px dashed #0587ab;
+    /* border: 3px dashed #0587ab; */
     border-radius: 0.25rem;
     width: 80%;
     margin: auto;
     font-family: Poppins, sans-serif;
   }
+  
+
 
   .dropzone-content {
     margin-block-start: 0.0em;
     margin-block-end: 0.0em;
 
+  }
+
+  .container-dropzone-image{
+    border: 3px dashed #0587ab;
+    border-radius: 0.5rem;
+  }
+  .container-dropzone-landmarks{
+    border: 3px dashed #0587ab;
+    margin-top: 10px;
+    border-radius: 0.5rem;
   }
 
   .btn {
@@ -167,7 +179,7 @@ body {
     left: 1000px;
     background: #adadad6d;
     position: absolute;
-    transition: all 0.5s ease-Out;
+    transition: all 0.3s ease-Out;
     bottom: 0;
   }
   

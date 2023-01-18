@@ -10,6 +10,7 @@ function Dropzone({ onDrop, accept, open, text, hideList=true}) {
       onDrop,
     });
 
+
   // const files = acceptedFiles.map((file) => (
   //   <li key={file.path}>
   //     {file.path} - {file.size} bytes
@@ -20,6 +21,7 @@ function Dropzone({ onDrop, accept, open, text, hideList=true}) {
       {file.path} 
     </li>
   ));
+
 
   return (
     <div>
@@ -35,14 +37,16 @@ function Dropzone({ onDrop, accept, open, text, hideList=true}) {
               {text}{/* Drop Image here */}
             </p>
           )}
+
           <button type="button" onClick={open} className="btn">
             Select File
           </button>
         </div>
-      </div>
-      <aside hidden={hideList}>
+        <aside hidden={hideList}>
         <ul style={{fontSize:'0.6em', textAlign:'left'}}>{files}</ul>
       </aside> 
+      </div>
+      
     </div>
   );
 }

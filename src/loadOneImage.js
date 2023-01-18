@@ -1,6 +1,6 @@
 import './App.css';
 import './loadOneImage.css'
-import imageButton from './button-move.png';
+// import imageButton from './button-move.png';
 
 import React, {useCallback, useState} from 'react'
 
@@ -8,28 +8,28 @@ import Dropzone from "./Dropzone.js";
 import image from './icons/person.png';
 import imageColor from './icons/person-color.png';
 
-import {Estimate} from "./estimate.js"
-import ShowImage from './showImage2.js';
+// import {Estimate} from "./estimate.js"
+// import ShowImage from './showImage2.js';
+
+
 
 function LoadOneImage ({updateViewParent}) {
 
-    const [borderColor,setBorderColor] = useState('#0587AB')
-
     const [imageFromUser, setImageFromUser] = useState(image)
     const [landmarksFromUser, setLandmarksFromUser] = useState(null)
-    const [loadedImage, setLoadedImage] = useState(false)
 
     const [expressionImageOne, setExpressionImageOne] = useState('Rest')
     const [subjectID, setSubjectID] = useState('')
+    const [fileName, setFileName] = useState('')
 
     const onDropImage = useCallback((acceptedFiles) => {
         acceptedFiles.map((file) => {
           const reader = new FileReader();
           reader.onload = function (e) {
             setImageFromUser(e.target.result)
-            setLoadedImage(true)
           };
           reader.readAsDataURL(file);
+          setFileName(file.name)
           return file;
         });
       }, []);
@@ -40,7 +40,8 @@ function LoadOneImage ({updateViewParent}) {
           reader.onload = function (e) {
             setLandmarksFromUser(e.target.result)
           };
-          reader.readAsDataURL(file);
+          reader.readAsText(file);
+          // reader.readAsDataURL(file);
           return file;
         });
       }, []);
@@ -49,6 +50,7 @@ function LoadOneImage ({updateViewParent}) {
 
       var data = {
         image : imageFromUser,
+        fileName : fileName,
         landmarks : landmarksFromUser,
         expressionImageOne: expressionImageOne,
         subjectID : subjectID,
@@ -62,19 +64,19 @@ function LoadOneImage ({updateViewParent}) {
 
       }
       else {
-        console.log(data)
         updateViewParent('oneExpression', data)
       }
      }
 
      const backButton = () =>{
-      console.log('hi')
+      updateViewParent('welcomePage')
      }
 
+     // update expression based on user input
      const handleSelectExpression = (event) => {
       setExpressionImageOne(event.target.value)
      }
-
+    // update subjectID based on user input
      const handleInputID = (event) => {
       setSubjectID(event.target.value)
      }
@@ -94,21 +96,27 @@ function LoadOneImage ({updateViewParent}) {
     </nav>
       </header>
         <div className='center'>
-            <Dropzone 
-            onDrop={onDropImage} 
-            accept={ {'image/*': ['.png', '.jpg', '.jpeg', '.PNG', '.JPG', '.JPEG']}} 
-            text={'Drop Image Here'}
-            />
+            <div className='container-dropzone-image' >
+              <Dropzone 
+              onDrop={onDropImage} 
+              accept={ {'image/*': ['.png', '.jpg', '.jpeg', '.PNG', '.JPG', '.JPEG']}} 
+              text={'Drop Image Here'}
+              hideImage={true}
+              />
 
-            <div className='image-container'>
-                <img className='preview-image' src={imageFromUser}></img>
+              <div className='image-container'>
+                  <img className='preview-image' src={imageFromUser} alt-text =''></img>
+              </div>
             </div>
+
+            <div className='container-dropzone-landmarks' >
             <Dropzone 
             onDrop={onDropLandmarks} 
             accept={ {'text/*': ['.txt']}} 
             text = {'Drop Landmarks Here'}
             hideList = {false}
-            />
+            className='dropzone-landmarks'
+            /></div>
             <form className="information-form">
                 <div className="input-group">
                     <label htmlFor='subjectID' >Subject ID:</label>
