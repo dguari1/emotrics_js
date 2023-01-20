@@ -1,35 +1,16 @@
 import React, { Component, createRef } from 'react';
 import panzoom from 'panzoom';
 
-import { circleFromPoints } from './utils';
+import { circleFromPoints, distanceToPoint } from './utils';
 
-import dataLandmarks from './samples/Normal1_1.txt';
+import fileLandmarks from './samples/Normal1_1.js' ; 
 import image from './samples/Normal1_1.jpg';
-// import image from './IMG_0295.jpeg'
 import './showImage.css'
-import { FACEMESH_CONTOURS } from '@mediapipe/face_mesh';
 
-// const panzoom = require('./showImage.js') 
-// const lineByLine = require('n-readlines');
-// import LineReader from 'n-readlines';
 
-const FACEMESH_LIPS = [61,146,91,181,84,17,314,405,321,375,291,185,40,39,37,
-    0,267,269,270,409,291,95,88,178,87,14,317,402,318,324,308,191,80,81,
-    82,415,308]
+const greenColor = [36,37,38,39,42,43,44,45,60,61,62,63,64]
+const yellowColor = [76,77,78,79,80,81,82,83]
 
-const FACEMESH_LEFT_EYE = [263,249,390,373,374,380,381,382,362,466,388,387,386,385,384,398,362]
-
-const FACEMESH_LEFT_IRIS = [474,475,476,477,474]
-
-const FACEMESH_LEFT_EYEBROW = [276,283,282,295,285,300,293,334,296,336]
-
-const FACEMESH_RIGHT_EYE = [33,7,163,144,145,153,154,155,133,246,161,160,159,158,157,173,133]
-
-const FACEMESH_RIGHT_EYEBROW = [46,53,52,65,55,70,63,105,66,107]
-
-const FACEMESH_RIGHT_IRIS = [469,470,471,472,469]
-
- 
 class ShowImage extends Component {
     constructor(props) {
         super(props);
@@ -44,8 +25,15 @@ class ShowImage extends Component {
         this.panZoomCanvasRef = createRef();
         this.divPanZoomRef = createRef();
         this.elementRef = createRef();
-        this.landmarks = []
+        this.landmarks = null
+        this.visible = null
         this.iris = []
+
+
+        this.leftImage = 0
+        this.topImage = 0
+
+        this.modifyPoint = null
     }
 
     componentDidMount = () => {
@@ -85,9 +73,9 @@ class ShowImage extends Component {
             var visibleWidth = rect.width;
             var visibleHeight = rect.height;
 
-            var leftImage = rectImage.left;
+            this.leftImage = rectImage.left;
             var rightImage = rectImage.right;
-            var topImage = rectImage.top;
+            this.topImage = rectImage.top;
             var bottomImage = rectImage.bottom
 
             var leftCanvasLandmarks = 0;
@@ -96,42 +84,42 @@ class ShowImage extends Component {
             var heightCanvasLandmarks = 0; 
 
             // make sure that visible canvas doesn't go above the visible screen
-            if (leftImage>=0) {
-                leftCanvasLandmarks = leftImage;
+            if (this.leftImage>=0) {
+                leftCanvasLandmarks = this.leftImage;
             } else {
                 leftCanvasLandmarks = 0 
             }
             if (rightImage<=visibleWidth){
-                if (leftImage>=0){
-                    widthCanvasLandmarks = rightImage-leftImage
+                if (this.leftImage>=0){
+                    widthCanvasLandmarks = rightImage-this.leftImage
                 } else {
                     widthCanvasLandmarks = rightImage
                 }   
             } 
             else if (rightImage>visibleWidth){
-                if (leftImage>=0){
-                    widthCanvasLandmarks = visibleWidth-leftImage
+                if (this.leftImage>=0){
+                    widthCanvasLandmarks = visibleWidth-this.leftImage
                 } else {
                     widthCanvasLandmarks = visibleWidth
                 }
             }
 
             
-            if (topImage>=0) {
-                topCanvasLandmarks = topImage;
+            if (this.topImage>=0) {
+                topCanvasLandmarks = this.topImage;
             } else {
                 topCanvasLandmarks = 0
             }
             if (bottomImage<=visibleHeight){
-                if (topImage>=0){
-                    heightCanvasLandmarks = bottomImage-topImage
+                if (this.topImage>=0){
+                    heightCanvasLandmarks = bottomImage-this.topImage
                 } else {
                     heightCanvasLandmarks = bottomImage
                 }
 
             } else if (bottomImage > visibleHeight) {
-                if (topImage >=0){
-                    heightCanvasLandmarks = visibleHeight-topImage;
+                if (this.topImage >=0){
+                    heightCanvasLandmarks = visibleHeight-this.topImage;
                 } else {
                     heightCanvasLandmarks = visibleHeight
                 }
@@ -153,16 +141,13 @@ class ShowImage extends Component {
             this.canvasLandmarksRef.current.width = widthCanvasLandmarks;
             this.canvasLandmarksRef.current.height= heightCanvasLandmarks;
 
-            console.log(this.canvasLandmarksRef.current.width, this.canvasLandmarksRef.current.height)
-
-            this.drawLandmarks(leftImage, topImage)
+            this.drawLandmarks(this.leftImage, this.topImage)
         }
         )
 
 
         this.processInitialData()
         this.drawLandmarks(0,0)
-
     }
 
     handleLoadImage = () => {
@@ -195,22 +180,91 @@ class ShowImage extends Component {
         var p2 = [2756,1729];
         var p3 = [2549,1714];
         var p4 = [2657,1622];
-        console.log(circleFromPoints(p1,p2,p3,p4))
-        
-
+        const circle = circleFromPoints(p1,p2,p3,p4)
+      
         if (this.props.data) {
             //check if landmarks are provided
             if (this.props.data.landmarks) {
-                //landmarks are provided
+                //landmarks are provided from file
+                var lines = this.props.data.landmarks.split('\n');
+                for (var line = 0; line < lines.length; line++) {
+                console.log(lines[line]);
+                }
+            }
 
-            } else if (dataLandmarks) {
-                //sample image
-            } else {
+        } else if (fileLandmarks) {
+                // //sample image
+                // const reader = new FileReader();
+                // reader.onload = function (e) {
+                //     console.log(e)
+                //   };
+                // reader.readAsText(dataLandmarks);
+                // // var lines = dataLandmarks.split('\n');
+                // // for (var line = 0; line < lines.length; line++) {
+                // // console.log(lines[line]);
+                // // }
+
+                var landmarks = []
+                var visible = []
+                var leftEyeCircle = []
+                var rightEyeCircle = []
+                var currentIndex = 0
+
+                var lines = fileLandmarks.split('\n');
+                for (var line = 0; line < lines.length; line++) {
+                    if ((line>=4) && (line<=79)) {
+                        var currentLine = lines[line].split(',')
+                        landmarks[currentIndex] = [parseInt(currentLine[0]), parseInt(currentLine[1])]
+                        visible[currentIndex] = [true]
+                        currentIndex+=1
+                    }
+                    if ((line>=82) && (line<=84)) {
+                        var currentLine = lines[line]
+                        leftEyeCircle.push(parseInt(currentLine))
+                    }
+                    if ((line>=87) && (line<=89)) {
+                        var currentLine = lines[line]
+                        rightEyeCircle.push(parseInt(currentLine))
+                    }
+                }
+
+                landmarks[currentIndex] = [leftEyeCircle[0] - leftEyeCircle[2],leftEyeCircle[1]]
+                visible[currentIndex] = [true]
+                currentIndex+=1
+                landmarks[currentIndex] = [leftEyeCircle[0],leftEyeCircle[1] - leftEyeCircle[2]]
+                visible[currentIndex] = [true]
+                currentIndex+=1
+                landmarks[currentIndex] = [leftEyeCircle[0] + leftEyeCircle[2],leftEyeCircle[1]]
+                visible[currentIndex] = [true]
+                currentIndex+=1
+                landmarks[currentIndex] = [leftEyeCircle[0],leftEyeCircle[1] + leftEyeCircle[2]]
+                visible[currentIndex] = [true]
+                currentIndex+=1
+
+                landmarks[currentIndex] = [rightEyeCircle[0] - rightEyeCircle[2],rightEyeCircle[1]]
+                visible[currentIndex] = [true]
+                currentIndex+=1
+                landmarks[currentIndex] = [rightEyeCircle[0],rightEyeCircle[1] - rightEyeCircle[2]]
+                visible[currentIndex] = [true]
+                currentIndex+=1
+                landmarks[currentIndex] = [rightEyeCircle[0] + rightEyeCircle[2],rightEyeCircle[1]]
+                visible[currentIndex] = [true]
+                currentIndex+=1
+                landmarks[currentIndex] = [rightEyeCircle[0],rightEyeCircle[1] + rightEyeCircle[2]]
+                visible[currentIndex] = [true]
+                currentIndex+=1
+
+
+                
+        } else {
                 //run the data in the model 
                 console.log('run data in online model :)')
             }
 
-        }
+        this.landmarks = landmarks
+        this.visible = visible
+
+        
 
     }
 
@@ -219,68 +273,9 @@ class ShowImage extends Component {
         this.handleLoadImage()
         this.handleLoadLandmarks()
 
-        // get image from props or file
-        
-
-        // var lines = this.props.data.landmarks.split('\n');
-        // for (var line = 0; line < lines.length; line++) {
-        // console.log(lines[line]);
-        // }
-
     }
 
-
-
-    updateCanvasInView = () => {
-        let rect = this.imageRef.current.getBoundingClientRect()
-        this.canvasRef.current.width = rect.width;
-        this.canvasRef.current.height = rect.height;
-        const initx = rect.left
-        const inity = rect.top 
-        this.canvasRef.current.style.left = `${initx}px`
-        this.canvasRef.current.style.top = `${inity}px`
-
-    }
  
-    getUsefulLandmarks = (data) => {
-
-        FACEMESH_LIPS.forEach(item => {
-            this.landmarks.push({x: data.keypoints[item].x, 
-                                 y: data.keypoints[item].y})
-        })
-        FACEMESH_LEFT_EYE.forEach(item => {
-            this.landmarks.push({x: data.keypoints[item].x, 
-                                 y: data.keypoints[item].y})
-        })
-        
-        FACEMESH_LEFT_EYEBROW.forEach(item => {
-            this.landmarks.push({x: data.keypoints[item].x, 
-                                 y: data.keypoints[item].y})
-        })
-
-        FACEMESH_RIGHT_EYE.forEach(item => {
-            this.landmarks.push({x: data.keypoints[item].x, 
-                                 y: data.keypoints[item].y})
-        })
-
-        FACEMESH_RIGHT_EYEBROW.forEach(item => {
-            this.landmarks.push({x: data.keypoints[item].x, 
-                                 y: data.keypoints[item].y})
-        })
-
-        
-
-        FACEMESH_LEFT_IRIS.forEach(item => {
-            this.iris.push({x: data.keypoints[item].x, 
-                                 y: data.keypoints[item].y})
-        })
-        FACEMESH_RIGHT_IRIS.forEach(item => {
-            this.iris.push({x: data.keypoints[item].x, 
-                                 y: data.keypoints[item].y})
-        })
-
-    }
-
     componentWillUnmount = () => {
         this.panZoomRef.current.dispose();
     }
@@ -305,32 +300,32 @@ class ShowImage extends Component {
         if (xTranslate>0) {xTranslate=0}
         if (yTranslate>0) {yTranslate=0}
 
-        var x = 2645
-        var y = 1712
-        const scale = this.panZoomRef.current.getTransform().scale
-        const dim = (0.005)*(this.canvasRef.current.width)// 1% of image width scaled to current zoom level
-        if  (dim>20) {dim=20} 
 
-        this.drawCircle(this.ctxLandmarks, x*scale +xTranslate, y*scale +yTranslate , dim*scale, 'red','red',1)
+        const scale = this.panZoomRef.current.getTransform().scale
+        var dim = (0.005)*(this.canvasRef.current.width)// 1% of image width scaled to current zoom level
+        if  (dim>20) {dim=20} 
+        this.ctxLandmarks.clearRect(0, 0, this.ctxLandmarks.canvas.width, this.ctxLandmarks.canvas.height)
+
+        this.landmarks.forEach((item, idx) => {
+
+            var x = item[0]
+            var y = item[1]
+            var color = 'red'
+            if (yellowColor.includes(idx)) {color = 'yellow'} 
+            if (greenColor.includes(idx)) {color = 'green'} 
+            //draw
+            if (this.visible[idx]) {this.drawCircle(this.ctxLandmarks, x*scale +xTranslate, y*scale +yTranslate , dim*scale, color,color,1)}
+        })
+
 
     }
 
     handleClick = (event) => {
         switch (event.target.id) {
             case 'resetZoom':
-                // this.panZoomRef.current.moveTo(0, 0);
-                // this.panZoomRef.current.zoomAbs(0, 0, 1);
-                // this.panZoomCanvasRef.current.moveTo(0, 0);
-                // this.panZoomCanvasRef.current.zoomAbs(0, 0, 1);
-
-                // var ratio = window.innerHeight/img.height
-                // console.log(ratio)
-                // this.panZoomRef.current.zoomAbs(this.elementRef.current.getBoundingClientRect().width/2 - (this.canvasRef.current.width*ratio)/2, 0, ratio);
-
                 var ratio = window.innerHeight/this.canvasRef.current.height
                 this.panZoomRef.current.moveTo(this.elementRef.current.getBoundingClientRect().width/2- (this.canvasRef.current.width*ratio)/2, 0);
                 this.panZoomRef.current.zoomAbs(this.elementRef.current.getBoundingClientRect().width/2 - (this.canvasRef.current.width*ratio)/2, 0, ratio);
-
                 break;
             case 'return':
                 this.props.updateViewParent('welcomePage')
@@ -358,12 +353,32 @@ class ShowImage extends Component {
 
 
         var pos = this.getMousePosition(event, this.canvasRef.current)
-        console.log(pos)
 
         if (event.button === 0)
             {console.log('left')}
         else if (event.button === 2) 
-        {console.log('right')}
+            {   
+                //if there are no lifted points 
+                if ((this.modifyPoint==null)) {
+                    console.log('right')
+                    if (this.landmarks != null){
+                        const findDistance = distanceToPoint(this.landmarks, [pos.x, pos.y])
+                        if (findDistance[0]<10) {
+                            this.modifyPoint = findDistance[1]
+                            this.visible[this.modifyPoint]=false
+                            this.drawLandmarks(this.leftImage, this.topImage)
+                        }
+                    }
+                } else {
+                    if (this.landmarks != null){
+                        
+                        this.visible[this.modifyPoint] = true
+                        this.landmarks[this.modifyPoint] = [Math.round(pos.x), Math.round(pos.y)]
+                        this.drawLandmarks(this.leftImage, this.topImage)
+                        this.modifyPoint = null
+                    }
+                }           
+            }
 
     }
  

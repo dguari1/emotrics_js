@@ -43,8 +43,28 @@ export function circleFromPoints(p1,p2,p3,p4) {
     return [xCenter, yCenter, radius]
 }
 
+export function distanceToPoint(landmarks, point) {
+    var distance = []
+    landmarks.forEach(element => {
+        distance.push(+Math.sqrt((element[0] - point[0])**2 + (element[1] - point[1])**2).toFixed(3))
+    });
+    const minDistance = Math.min(...distance)
+    // const argMinDistance = Array(distance).indexOf(minDistance)
+    const argMinDistance = findPositionInArray(distance,minDistance)
+    return [minDistance, argMinDistance]
+}
+
 // function to compute the average of an array of numbers  
 export function average(array) {
     return array.reduce((a, b) => a + b) / array.length;
 }
 
+export function findPositionInArray(array,number) {
+    var diff = null
+    for (var i = 0; i<=array.length-1; i++) {
+
+        diff = array[i]-number
+        if (diff === 0) {break;}
+    }
+    return i
+}
